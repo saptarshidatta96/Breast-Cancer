@@ -2,20 +2,32 @@ from flask import Flask, request, jsonify
 import joblib
 import pandas as pd
 
+
 app = Flask(__name__)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
+
+
 def predict():
     if knn_model:
         try:
-            json_ = request.json
-            print(json_)
-            query = pd.get_dummies(pd.DataFrame(json_))
-            query = query.reindex(columns=model_columns, fill_value=0)
+            if request.get_json() is not None:
+                json_ = request.json
+                query = pd.get_dummies(pd.DataFrame(json_))
+                query = query.reindex(columns=model_columns, fill_value=0)
+                prediction = list(knn_model.predict(query))
 
-            prediction = list(knn_model.predict(query))
+                return jsonify({'prediction': str(prediction),
+                                'Input': request.json})
+            else:
+                
+                json_ = [request.args]
+                query = pd.get_dummies(pd.DataFrame(json_))
+                query = query.reindex(columns=model_columns, fill_value=0)
+                prediction = list(knn_model.predict(query))
 
-            return jsonify({'prediction': str(prediction)})
+                return jsonify({'prediction': str(prediction),
+                                'Input': [request.args]})
 
         except Exception as e:
 
