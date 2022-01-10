@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: breast-cancer-api
+  labels:
+    app: breast-cancer-model-api
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: breast-cancer
+  template:
+    metadata:
+      labels:
+        app: breast-cancer
+    spec:
+      containers:
+      - name: breast-cancer
+        image: breastcancersd.azurecr.io/breast_cancer:v1.0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: breast-cancer-entrypoint
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: breast-cancer
+  ports:
+  - port: 12345
+    targetPort: 12345

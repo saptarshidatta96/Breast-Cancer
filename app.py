@@ -3,7 +3,9 @@ import joblib
 import pandas as pd
 
 
+
 app = Flask(__name__)
+
 
 @app.route('/predict', methods=['POST', 'GET'])
 
